@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Union, List, Dict, Any, Optional
+from typing import Union, List, Any, Optional
 
 import httpx
 from rich.pretty import pprint
@@ -23,7 +23,7 @@ class Attribute:
     data_type: str
     unit: Optional[str]
     group_type: str
-    value_str: Union[int, str]
+    # value_str: Union[int, str]
 
 
 @dataclass
@@ -68,20 +68,14 @@ class User:
     id: int
     email: str
     phone: str
+    phones: List[str]
     last_seen: str
     user_registered: str
 
 
 @dataclass
 class Badge:
-    action: str | None
-    share_link: str
-    is_boost: bool
-    is_vip: bool
-    is_top: bool
-    tops_count: int
-    paid_info: None
-    tracking_params: None
+    pass
 
 
 @dataclass
@@ -122,20 +116,21 @@ class Product:
     moderation_reasons: None
     on_hold_reason: None
     can_make_offer: bool
-    badge: Badge
-    apply_action: None
+    # badge: Badge
     share_link: str
-    icon_attributes: List[Any]
+    share_link: str
+    is_boost: bool
+    is_vip: bool
+    is_top: bool
+    tops_count: int
+    paid_info: None
+    tracking_params: None
     price_valuation: PriceValuation
-    inspection_id: None
     images: List[Image]
     can_leave_opinion: bool
     abuse_reported: bool
     sold_reported: bool
-    title_labels: List[Any]
-    blocks: Dict[str, Any]
     advert_status: str
-    advert_status_db: int
     appropriate_status_for_top: bool
     is_open: bool
     fav_count: int
@@ -177,7 +172,7 @@ class MinProduct:
     user_id: int
     user_phone: str
     image_count: int
-    _client: "JIJI"
+    _client: "JIJI" = None
 
     async def get_product(self) -> Product:
         if not self._client:
@@ -255,6 +250,7 @@ class JIJI:
                 user_id=product["user_id"],
                 user_phone=product["user_phone"],
                 image_count=product["count_images"],
+                _client=self,
             )
             for product in res["results"]
         ]
@@ -266,9 +262,78 @@ class JIJI:
         :return: Product.
         """
         res = await self._process_request(
-            constants.PRODUCT.format(product_id), param={"ad_attr_view": 2}
+            constants.PRODUCT.format(id=product_id), params={"ad_attr_view": 2}
         )
-        return Product(**res)
+        return Product(
+            id=res["id"],
+            guid=res["guid"],
+            category_slug=res["category_slug"],
+            title=res["title"],
+            region_id=res["region_id"],
+            regions_display=res["regions_display"],
+            published=res["published"],
+            date_created=datetime.fromtimestamp(res["date_moderated"]),
+            date_moderated=datetime.fromtimestamp(res["date_moderated"]),
+            review_estimation=res["review_estimation"],
+            price=res["price"],
+            price_history=res["price_history"],
+            formatted_price=res["formatted_price"],
+            price_obj=Price(
+                value=res["price_obj"]["value"],
+                view=res["price_obj"]["view"],
+                period=res["price_obj"]["period"],
+                bulk=res["price_obj"]["bulk"],
+                price=res["price_obj"]["price"],
+                text=res["price_obj"]["text"],
+            ),
+            price_type=res["price_type"],
+            attributes=[Attribute(**attr) for attr in res["attributes"]],
+            description=res["description"],
+            video=res["video"],
+            user=User(
+                id=res["user_id"],
+                phone=res["user_phone"],
+                name=res["user_name"],
+                avatar_url=res["user_avatar_url"],
+                phones=res["user_phones"],
+                email=res["user_email"],
+                user_registered=res["user_registered"],
+                last_seen=res["last_seen"],
+            ),
+            category_id=res["category_id"],
+            tags=res["tags"],
+            long_tag=res["longest_tag"],
+            rating=res["rating"],
+            page_views=res["page_views"],
+            moderation_reasons=res["moderation_reasons"],
+            on_hold_reason=res["on_hold_reason"],
+            can_make_offer=res["can_make_offer"],
+            share_link=res["share_link"],
+            is_boost=res["is_boost"],
+            is_top=res["is_top"],
+            tops_count=res["tops_count"],
+            paid_info=res["paid_info"],
+            tracking_params=res["tracking_params"],
+            price_valuation=PriceValuation(
+                value=res["price_valuation"]["value"],
+                price_range=res["price_valuation"]["price_range"],
+                label=res["price_valuation"]["label"],
+                url=res["price_valuation"]["url"],
+            )
+            if res.get("price_valuation")
+            else None,
+            images=[Image(**image) for image in res["images"]],
+            can_leave_opinion=res["can_leave_opinion"],
+            abuse_reported=res["abuse_reported"],
+            sold_reported=res["sold_reported"],
+            advert_status=res["advert_status"],
+            appropriate_status_for_top=res["appropriate_status_for_top"],
+            is_open=res["is_open"],
+            fav_count=res["fav_count"],
+            is_user_ad=res["is_user_ad"],
+            x_listing_id=res["X-Listing-ID"] if res.get("X-Listing-ID") else None,
+            is_vip=res["is_vip"],
+        )
 
     async def get_trending(self, page: int = 1) -> List[MinProduct]:
         """
@@ -292,6 +357,7 @@ class JIJI:
                 user_id=product["user_id"],
                 user_phone=product["user_phone"],
                 image_count=product["count_images"],
+                _client=self,
             )
             for product in res["results"]
         ]
@@ -302,4 +368,4 @@ if __name__ == "__main__":
 
     loop = asyncio.get_event_loop()
     jiji = JIJI()
-    pprint(loop.run_until_complete(jiji.get_trending()))
+    pprint(loop.run_until_complete(jiji.get_product(546021)))
