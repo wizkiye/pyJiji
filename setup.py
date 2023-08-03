@@ -9,9 +9,9 @@ def read(filename):
 
 setup(
     name="jiji",
-    version="",
+    version="0.0.1",
     packages=find_packages(),
-    url="",
+    url="https://github.com/wizkiye/pyJiji",
     license="",
     author="Kidus",
     author_email="",
