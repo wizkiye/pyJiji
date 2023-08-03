@@ -17,4 +17,6 @@ setup(
     author_email="",
     description="",
     requires=["httpx"],
+    long_description=read("README.md"),
+    long_description_content_type="text/markdown",
 )
