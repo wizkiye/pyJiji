@@ -19,7 +19,7 @@ class Attribute:
     data_type: str
     unit: Optional[str]
     group_type: str
-    display_type: str | None = None
+    display_type: Union[str, None] = None
     # value_str: Union[int, str]
 
 
@@ -87,7 +87,7 @@ class PriceValuation:
 class Product:
     id: int
     guid: str
-    category_slug: str | None
+    category_slug: Union[str, None]
     title: str
     region_id: int
     regions_display: List[str]
@@ -100,14 +100,14 @@ class Product:
     price_type: str
     attributes: List[Attribute]
     description: str
-    video: None | str
+    video: Union[None, str]
     user: User
     category_id: int
     tags: List[List[str]]
     long_tag: str
     date_moderated: datetime
     date_created: datetime
-    rating: None | int
+    rating: Union[None, int]
     page_views: int
     is_user_ad: bool
     moderation_reasons: None
@@ -213,8 +213,8 @@ class MinProduct:
     region_id: int
     published: str
     date: datetime
-    price: int | None
-    price_type: str | None
+    price: Union[int, None]
+    price_type: Union[str, None]
     image: str
     attributes: List[Any]
     details: str
