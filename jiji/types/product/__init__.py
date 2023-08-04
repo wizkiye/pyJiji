@@ -19,6 +19,7 @@ class Attribute:
     data_type: str
     unit: Optional[str]
     group_type: str
+    display_type: str | None = None
     # value_str: Union[int, str]
 
 
