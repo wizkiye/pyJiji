@@ -16,7 +16,7 @@ setup(
     author="Kidus",
     author_email="",
     description="",
-    requires=["httpx"],
+    install_requires=["httpx>=0.24.1"],
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
 )

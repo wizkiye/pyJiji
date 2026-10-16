@@ -15,11 +15,13 @@ class ProductAttribute:
 @dataclass
 class Attribute:
     name: str
-    value: Union[int, str]
+    value: Union[int, float, str, List[Any]]
     data_type: str
     unit: Optional[str]
     group_type: str
     display_type: Union[str, None] = None
+    listing: Union[dict, None] = None
+    value_icons_map: Union[dict, None] = None
     # value_str: Union[int, str]
 
 
@@ -211,15 +213,15 @@ class MinProduct:
     guid: str
     title: str
     region_id: int
-    published: str
+    published: Union[str, None]
     date: datetime
     price: Union[int, None]
     price_type: Union[str, None]
     image: str
     attributes: List[Any]
-    details: str
+    details: Union[str, None]
     user_id: int
-    user_phone: str
+    user_phone: Union[str, None]
     image_count: int
     _client: "jiji.JiJi" = None
 

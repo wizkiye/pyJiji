@@ -145,7 +145,7 @@ class JiJi:
             attributes=product["attributes"],
             details=product.get("details"),
             user_id=product["user_id"],
-            user_phone=product["user_phone"],
+            user_phone=product.get("user_phone"),
             image_count=product["count_images"],
             _client=self,
         )
@@ -199,9 +199,18 @@ class JiJi:
             constants.SEARCH.format(page=page),
             params=params,
         )
-        result = res["results"]
+        if "results" not in res:
+            slug = (res.get("url") or "").rstrip("/").rsplit("/", 1)[-1]
+            if slug:
+                params["query"] = slug
+                res = await self._process_request(
+                    constants.SEARCH.format(page=page),
+                    params=params,
+                )
         return SearchResult(
-            found=res["found"],
-            next_url=res["next_url"],
-            products=[self._dict_to_min_product(product) for product in result],
+            found=res.get("found", 0),
+            next_url=res.get("next_url"),
+            products=[
+                self._dict_to_min_product(product) for product in res.get("results", [])
+            ],
         )
